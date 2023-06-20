@@ -1,18 +1,17 @@
 import requests
 
 
-def obtenerPorcentajeCiudad(ciudad):
+def getWheelchairPercentage(city):
     """
-    Esta función recibe el nombre de la ciudad (str) y devuelve el porcentaje de nodos del mapa que tiene el tag "wheelchair"
-    o silla de ruedas.
+    This function receives the name of a city (str) and returns the percentage of nodes that includes the tag wheelchair.
     """
 
 
-# Definir las consultas necesarias a la API de Overpass (Open Street Map)
+# Define the queries to Overpass API (Open Street Map)
     overpassUrl = "https://overpass-api.de/api/interpreter"
     query = f"""
     [out:json];
-    area[name="{ciudad}"]->.searchArea;
+    area[name="{city}"]->.searchArea;
     (
       node["wheelchair"="yes"](area.searchArea);
       way["wheelchair"="yes"](area.searchArea);
@@ -23,7 +22,7 @@ def obtenerPorcentajeCiudad(ciudad):
 
     queryTotal = f"""
     [out:json];
-    area[name="{ciudad}"]->.searchArea;
+    area[name="{city}"]->.searchArea;
     (
       node["wheelchair"~"^(yes|no)$"](area.searchArea);
       way["wheelchair"~"^(yes|no)$"](area.searchArea);
@@ -32,24 +31,24 @@ def obtenerPorcentajeCiudad(ciudad):
     out;
     """
 
-    # Enviar las consultas a OverPass
+    # Send the querys to OverPass
     response = requests.get(overpassUrl, params={"data": query})
     data = response.json()
 
     responseTotal = requests.get(overpassUrl, params={"data": queryTotal})
     dataTotal = responseTotal.json()
 
-    # Obtener el total de elementos o nodos del mapa de la ciudad
-    totalNodos = len(dataTotal["elements"])
-    nodosWheelchair = 0
+    # Obtein the total amount of elements
+    totalNodes = len(dataTotal["elements"])
+    wheelchairNodes = 0
 
     for element in data["elements"]:
         tags = element.get("tags", {})
         if "wheelchair" in tags and tags["wheelchair"] == "yes":
-            nodosWheelchair += 1
+            wheelchairNodes += 1
 
     # Obtener porcentaje
-    porcentajeWheelchair = int((nodosWheelchair / totalNodos) * 100)
+    wheelchairPercentage = int((wheelchairNodes / totalNodes) * 100)
 
     # Imprimir los resultados
     # print("Número total de nodos:", totalNodos)
@@ -57,4 +56,4 @@ def obtenerPorcentajeCiudad(ciudad):
     # print("Porcentaje de nodos con wheelchair=yes sobre el total:",
     #       porcentajeWheelchair, "%")
 
-    return porcentajeWheelchair
+    return wheelchairPercentage

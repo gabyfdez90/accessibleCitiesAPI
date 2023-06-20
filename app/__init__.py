@@ -1,43 +1,49 @@
-from flask import Flask, render_template, jsonify
+from flask import Flask, jsonify
 from http import HTTPStatus
-from app.accesibilidad import *
-from app.ocio import *
-from app.transporte import *
+from app.wheelchairTotal import *
+from app.leisure import *
+from app.transportation import *
 from app.parking import *
 
 app = Flask(__name__)
 
 
-@app.route("/api/<string:ciudad1>/<string:ciudad2>")
-def compararCiudades(ciudad1, ciudad2):
+@app.route("/api/<string:city1>/<string:city2>")
+def compareCities(city1, city2):
 
-    ciudad1Format = ciudad1.capitalize()
-    ciudad2Format = ciudad2.capitalize()
+    city1Format = city1.capitalize()
+    city2Format = city2.capitalize()
 
-    porcentajeCiudad1 = obtenerPorcentajeCiudad(ciudad1Format)
-    porcentajeCiudad2 = obtenerPorcentajeCiudad(ciudad2Format)
+    cityPercentage1 = getWheelchairPercentage(city1Format)
+    cityPercentage2 = getWheelchairPercentage(city2Format)
 
-    porcentajeOcio1 = obtenerOcio(ciudad1Format)
-    porcentajeOcio2 = obtenerOcio(ciudad2Format)
+    leisurePercentage1 = getLeisurePercentage(city1Format)
+    leisurePercentage2 = getLeisurePercentage(city2Format)
 
-    porcentajeTransporte1 = obtenerTransporte(ciudad1Format)
-    porcentajeTransporte2 = obtenerTransporte(ciudad2Format)
+    transportationPercentage1 = getTransportationPercentage(city1Format)
+    transportationPercentage2 = getTransportationPercentage(city2Format)
 
-    porcentajeParking1 = obtenerParking(ciudad1Format)
-    porcentajeParking2 = obtenerParking(ciudad2Format)
+    parkingPercentage1 = getParkingPercentage(city1Format)
+    parkingPercentage2 = getParkingPercentage(city2Format)
 
     return jsonify(
         {
             "status": "OK",
-            "ciudad1": ciudad1Format,
-            "porcentajeAccesibilidad1": porcentajeCiudad1,
-            "porcentajeOcio1": porcentajeOcio1,
-            "ciudad2": ciudad2Format,
-            "porcentajeAccesibilidad2": porcentajeCiudad2,
-            "porcentajeOcio2": porcentajeOcio2,
-            "porcentajeTransporte1": porcentajeTransporte1,
-            "porcentajeTransporte2": porcentajeTransporte2,
-            "porcentajeParking1": porcentajeParking1,
-            "porcentajeParking2": porcentajeParking2
+
+            "city1": {
+                "name": city1Format,
+                "wheelchairAccessibility": cityPercentage1,
+                "wheelchairFacilitiesInLeisure": leisurePercentage1,
+                "wheelchairTransportation": transportationPercentage1,
+                "wheelchairParking": parkingPercentage1
+            },
+
+            "city2": {
+                "name": city2Format,
+                "wheelchairAccessibility": cityPercentage2,
+                "wheelchairFacilitiesInLeisure": leisurePercentage2,
+                "wheelchairTransportation": transportationPercentage2,
+                "wheelchairParking": parkingPercentage2
+            }
         }
     ), HTTPStatus.OK

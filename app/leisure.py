@@ -1,17 +1,17 @@
 import requests
 
 
-def obtenerOcio(ciudad):
+def getLeisurePercentage(city):
     """
-        Esta función recibe el nombre de la ciudad (str) y devuelve el porcentaje de nodos del mapa que están relacionados
-        con ocio (hoteles, restaurantes, etc.) y que tienen el tag "wheelchair".
+        This function receives the name of the city (str) and returns the percentage of nodes which are related with leisure
+        (hotels, restaurantes, etc.) which have the tag wheelchair.
     """
 
-    # Definir las consultas necesarias a la API de Overpass (Open Street Map)
+    # Define queries to Overpass (Open Street Map)
     overpassUrl = "https://overpass-api.de/api/interpreter"
     accesibleQuery = f"""
     [out:json];
-    area[name="{ciudad}"]->.searchArea;
+    area[name="{city}"]->.searchArea;
     (
     node(area.searchArea)["amenity"~"^(restaurant|hotel|shop)$"]["wheelchair"="yes"];
     );
@@ -21,14 +21,14 @@ def obtenerOcio(ciudad):
 
     totalQuery = f"""
     [out:json];
-    area[name="{ciudad}"]->.searchArea;
+    area[name="{city}"]->.searchArea;
     (
     node(area.searchArea)["amenity"~"^(restaurant|hotel|shop)$"];
     );
     out count;
     """
 
-    # Enviar las consultas de elementos totales y accesibles a la API
+    # Send queries for the total and the tagged segment
     accesibleResponse = requests.get(
         overpassUrl, params={"data": accesibleQuery})
     accesibleData = accesibleResponse.json()
@@ -37,14 +37,14 @@ def obtenerOcio(ciudad):
     totalData = totalResponse.json()
     totalCount = int(totalData["elements"][0]["tags"]["total"])
 
-    # Procesar la respuesta de la API
+    # Process API response
     accesibleFacilities = 0
     if "elements" in accesibleData:
         for element in accesibleData["elements"]:
             if element["type"] == "node":
                 accesibleFacilities += 1
 
-    # Obtener porcentaje
-    porcentajeOcio = round((accesibleFacilities / totalCount) * 100, 2)
+    # Obtain percentage
+    leisurePercentage = round((accesibleFacilities / totalCount) * 100, 2)
 
-    return porcentajeOcio
+    return leisurePercentage

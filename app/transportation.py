@@ -1,17 +1,17 @@
 import requests
 
 
-def obtenerTransporte(ciudad):
+def getTransportationPercentage(city):
     """
-        Esta función recibe el nombre de la ciudad (str) y devuelve el porcentaje de nodos del mapa que están relacionados
-        con transporte público (estaciones, paradas, vehículos, etc.) y que tienen el tag "wheelchair".
+        This function receives the name of a city (str) and returns the percentage of map nodes where 
+        public transportation facilities (bus stops, stations, etc) are tagged with wheelchair.
     """
 
-    # Definir las consultas necesarias a la API de Overpass (Open Street Map)
+    # Define the queries to Overpass API (Open Street Map)
     overpass_url = "https://overpass-api.de/api/interpreter"
     accesibleQuery = f"""
     [out:json];
-    area[name="{ciudad}"]->.searchArea;
+    area[name="{city}"]->.searchArea;
     (
     node(area.searchArea)["public_transport"~"^(stop_position|station|vehicle)$"]["wheelchair"="yes"];
     way(area.searchArea)["public_transport"~"^(stop_position|station|vehicle)$"]["wheelchair"="yes"];
@@ -23,14 +23,14 @@ def obtenerTransporte(ciudad):
 
     totalQuery = f"""
     [out:json];
-    area[name="{ciudad}"]->.searchArea;
+    area[name="{city}"]->.searchArea;
     (
     node(area.searchArea)["public_transport"~"^(stop_position|station|vehicle)$"];
     );
     out count;
     """
 
-    # Enviar las consultas de elementos totales y accesibles a la API
+    # Send the queries to obtain the total and accesible segment of nodes
     accessibleResponse = requests.get(
         overpass_url, params={"data": accesibleQuery})
     data = accessibleResponse.json()
@@ -39,15 +39,15 @@ def obtenerTransporte(ciudad):
     totalData = totalResponse.json()
     totalCount = int(totalData["elements"][0]["tags"]["total"])
 
-    # Procesar los datos
+    # Process the data
     accesibleTransportation = 0
     if "elements" in data:
         for element in data["elements"]:
             if element["type"] == "node":
                 accesibleTransportation += 1
 
-    # Obtener porcentaje
-    porcentajeTransporte = round(
+    # Obtain percentage
+    transportationPercentage = round(
         (accesibleTransportation / totalCount) * 100, 2)
 
-    return porcentajeTransporte
+    return transportationPercentage
