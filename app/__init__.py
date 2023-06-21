@@ -4,6 +4,10 @@ from app.wheelchairTotal import *
 from app.leisure import *
 from app.transportation import *
 from app.parking import *
+from app.pavement import *
+from app.trafficSignalsSound import *
+from app.trafficSignalsVibration import *
+from app.crossingIsland import *
 
 app = Flask(__name__)
 
@@ -26,6 +30,20 @@ def compareCities(city1, city2):
     parkingPercentage1 = getParkingPercentage(city1Format)
     parkingPercentage2 = getParkingPercentage(city2Format)
 
+    tactilePavementPercentage1 = getTactilePavementPercentage(city1Format)
+    tactilePavementPercentage2 = getTactilePavementPercentage(city2Format)
+
+    trafficSignalsSound1 = getTrafficSignalsSoundPercentage(city1Format)
+    trafficSignalsSound2 = getTrafficSignalsSoundPercentage(city2Format)
+
+    trafficSignalsVibration1 = getTrafficSignalsVibrationPercentage(
+        city1Format)
+    trafficSignalsVibration2 = getTrafficSignalsVibrationPercentage(
+        city2Format)
+
+    crossingIslands1 = getCrossingIslandPercentage(city1Format)
+    crossingIslands2 = getCrossingIslandPercentage(city2Format)
+
     return jsonify(
         {
             "status": "OK",
@@ -35,7 +53,11 @@ def compareCities(city1, city2):
                 "wheelchairAccessibility": cityPercentage1,
                 "wheelchairFacilitiesInLeisure": leisurePercentage1,
                 "wheelchairTransportation": transportationPercentage1,
-                "wheelchairParking": parkingPercentage1
+                "wheelchairParking": parkingPercentage1,
+                "tactilePavement": tactilePavementPercentage1,
+                "trafficSignalsSound": trafficSignalsSound1,
+                "trafficSignalsVibration": trafficSignalsVibration1,
+                "crossingIslands": crossingIslands1
             },
 
             "city2": {
@@ -43,7 +65,11 @@ def compareCities(city1, city2):
                 "wheelchairAccessibility": cityPercentage2,
                 "wheelchairFacilitiesInLeisure": leisurePercentage2,
                 "wheelchairTransportation": transportationPercentage2,
-                "wheelchairParking": parkingPercentage2
+                "wheelchairParking": parkingPercentage2,
+                "tactilePavement": tactilePavementPercentage2,
+                "trafficSignalsSound": trafficSignalsSound2,
+                "trafficSignalsVibration": trafficSignalsVibration2,
+                "crossingIslands": crossingIslands2
             }
         }
     ), HTTPStatus.OK
