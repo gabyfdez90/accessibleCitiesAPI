@@ -47,13 +47,7 @@ def getWheelchairPercentage(city):
         if "wheelchair" in tags and tags["wheelchair"] == "yes":
             wheelchairNodes += 1
 
-    # Obtener porcentaje
+    # Obtein percentage
     wheelchairPercentage = int((wheelchairNodes / totalNodes) * 100)
-
-    # Imprimir los resultados
-    # print("Número total de nodos:", totalNodos)
-    # print("Nodos con wheelchair=yes:", nodosWheelchair)
-    # print("Porcentaje de nodos con wheelchair=yes sobre el total:",
-    #       porcentajeWheelchair, "%")
 
     return wheelchairPercentage
