@@ -1,4 +1,4 @@
-import requests
+from app.services.dataCollector import *
 
 
 def getTactilePavementPercentage(city):
@@ -8,7 +8,8 @@ def getTactilePavementPercentage(city):
     """
 
     # Define queries to Overpass (Open Street Map)
-    overpassUrl = "https://overpass-api.de/api/interpreter"
+    dataCollector = DataCollector(city)
+
     accesibleQuery = f"""
     [out:json];
     area[name="{city}"]->.searchArea;
@@ -32,24 +33,14 @@ def getTactilePavementPercentage(city):
     out count;
     """
 
-    # Send queries for the total and the tagged segment
-    accesibleResponse = requests.get(
-        overpassUrl, params={"data": accesibleQuery})
-    accesibleData = accesibleResponse.json()
+    # Send queries for the total and the tagged segment and process response
 
-    totalResponse = requests.get(overpassUrl, params={"data": totalQuery})
-    totalData = totalResponse.json()
-    totalCount = int(totalData["elements"][0]["tags"]["total"])
-
-    # Process API response
-    accesiblePavement = 0
-    if "elements" in accesibleData:
-        for element in accesibleData["elements"]:
-            if element["type"] == "node":
-                accesiblePavement += 1
+    totalCount = dataCollector.getTotalCount2(totalQuery)
+    accessibleCount = dataCollector.getAccessibleCount(accesibleQuery)
 
     # Obtain percentage
-    tactilePavementPercentage = round(
-        (accesiblePavement / totalCount) * 100, 2)
+
+    tactilePavementPercentage = dataCollector.getPercentage(
+        accessibleCount, totalCount)
 
     return tactilePavementPercentage

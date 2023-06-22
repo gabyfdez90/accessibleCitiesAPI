@@ -1,4 +1,4 @@
-import requests
+from app.services.dataCollector import *
 
 
 def getParkingPercentage(city):
@@ -7,9 +7,11 @@ def getParkingPercentage(city):
         related with parking and have the tag wheelchair on them.
     """
 
+    dataCollector = DataCollector(city)
+
     # Define queries to Overpass (Open Street Map)
-    overpassUrl = "https://overpass-api.de/api/interpreter"
-    accessibleQuery = f"""
+
+    accesibleQuery = f"""
     [out:json];
     area[name="{city}"]->.searchArea;
     (
@@ -32,23 +34,14 @@ def getParkingPercentage(city):
     out count;
     """
 
-    # Send queries and get response
-    accessibleResponse = requests.get(
-        overpassUrl, params={"data": accessibleQuery})
-    accesibleData = accessibleResponse.json()
+    # Send queries and process response
 
-    totalResponse = requests.get(overpassUrl, params={"data": totalQuery})
-    totalData = totalResponse.json()
-    totalCount = int(totalData["elements"][0]["tags"]["total"])
+    totalCount = dataCollector.getTotalCount2(totalQuery)
+    accessibleCount = dataCollector.getAccessibleCount(accesibleQuery)
 
-    # Process response
-    accessibleParking = 0
-    if "elements" in accesibleData:
-        for element in accesibleData["elements"]:
-            if element["type"] == "node" or element["type"] == "way":
-                accessibleParking += 1
+    # Obtain percentage
 
-     # Obtain percentage
-    parkingPercentage = round((accessibleParking / totalCount) * 100, 2)
+    parkingPercentage = dataCollector.getPercentage(
+        accessibleCount, totalCount)
 
     return parkingPercentage

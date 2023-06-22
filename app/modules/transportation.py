@@ -1,4 +1,4 @@
-import requests
+from app.services.dataCollector import *
 
 
 def getTransportationPercentage(city):
@@ -7,8 +7,10 @@ def getTransportationPercentage(city):
         public transportation facilities (bus stops, stations, etc) are tagged with wheelchair.
     """
 
+    dataCollector = DataCollector(city)
+
     # Define the queries to Overpass API (Open Street Map)
-    overpass_url = "https://overpass-api.de/api/interpreter"
+
     accesibleQuery = f"""
     [out:json];
     area[name="{city}"]->.searchArea;
@@ -31,23 +33,13 @@ def getTransportationPercentage(city):
     """
 
     # Send the queries to obtain the total and accesible segment of nodes
-    accessibleResponse = requests.get(
-        overpass_url, params={"data": accesibleQuery})
-    data = accessibleResponse.json()
 
-    totalResponse = requests.get(overpass_url, params={"data": totalQuery})
-    totalData = totalResponse.json()
-    totalCount = int(totalData["elements"][0]["tags"]["total"])
-
-    # Process the data
-    accesibleTransportation = 0
-    if "elements" in data:
-        for element in data["elements"]:
-            if element["type"] == "node":
-                accesibleTransportation += 1
+    totalCount = dataCollector.getTotalCount2(totalQuery)
+    accessibleCount = dataCollector.getAccessibleCount(accesibleQuery)
 
     # Obtain percentage
-    transportationPercentage = round(
-        (accesibleTransportation / totalCount) * 100, 2)
+
+    transportationPercentage = dataCollector.getPercentage(
+        accessibleCount, totalCount)
 
     return transportationPercentage

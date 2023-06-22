@@ -1,13 +1,13 @@
 from flask import Flask, jsonify
 from http import HTTPStatus
-from app.wheelchairTotal import *
-from app.leisure import *
-from app.transportation import *
-from app.parking import *
-from app.pavement import *
-from app.trafficSignalsSound import *
-from app.trafficSignalsVibration import *
-from app.crossingIsland import *
+from app.modules.wheelchairTotal import *
+from app.modules.leisure import *
+from app.modules.transportation import *
+from app.modules.parking import *
+from app.modules.pavement import *
+from app.modules.trafficSignalsSound import *
+from app.modules.trafficSignalsVibration import *
+from app.modules.crossingIsland import *
 
 app = Flask(__name__)
 

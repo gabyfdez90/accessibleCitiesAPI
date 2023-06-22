@@ -1,4 +1,4 @@
-import requests
+from app.services.dataCollector import *
 
 
 def getTrafficSignalsSoundPercentage(city):
@@ -8,7 +8,8 @@ def getTrafficSignalsSoundPercentage(city):
     """
 
     # Define queries to Overpass (Open Street Map)
-    overpassUrl = "https://overpass-api.de/api/interpreter"
+    dataCollector = DataCollector(city)
+
     accesibleQuery = f"""
     [out:json];
     area[name="{city}"]->.searchArea;
@@ -31,21 +32,14 @@ def getTrafficSignalsSoundPercentage(city):
     out count;
     """
 
-    # Send queries for the total and the tagged segment
-    accesibleResponse = requests.get(
-        overpassUrl, params={"data": accesibleQuery})
-    accesibleData = accesibleResponse.json()
+    # Send queries and process responses
 
-    totalResponse = requests.get(overpassUrl, params={"data": totalQuery})
-    totalData = totalResponse.json()
-
-    # Process API response
-    totalCount = int(totalData["elements"][0]["tags"]["total"])
-    trafficSignalsSoundCount = int(
-        accesibleData["elements"][0]["tags"]["total"])
+    totalCount = dataCollector.getTotalCount2(totalQuery)
+    accessibleCount = dataCollector.getAccessibleCount2(accesibleQuery)
 
     # Obtain percentage
-    trafficSignalsSoundPercentage = round(
-        (trafficSignalsSoundCount / totalCount) * 100, 2)
+
+    trafficSignalsSoundPercentage = dataCollector.getPercentage(
+        accessibleCount, totalCount)
 
     return trafficSignalsSoundPercentage

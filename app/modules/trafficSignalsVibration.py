@@ -1,4 +1,4 @@
-import requests
+from app.services.dataCollector import *
 
 
 def getTrafficSignalsVibrationPercentage(city):
@@ -7,8 +7,10 @@ def getTrafficSignalsVibrationPercentage(city):
         with a vibration device to be used by persons with visual disabilities.
     """
 
+    dataCollector = DataCollector(city)
+
     # Define queries to Overpass (Open Street Map)
-    overpassUrl = "https://overpass-api.de/api/interpreter"
+
     accesibleQuery = f"""
     [out:json];
     area[name="{city}"]->.searchArea;
@@ -31,21 +33,14 @@ def getTrafficSignalsVibrationPercentage(city):
     out count;
     """
 
-    # Send queries for the total and the tagged segment
-    accesibleResponse = requests.get(
-        overpassUrl, params={"data": accesibleQuery})
-    accesibleData = accesibleResponse.json()
+    # Send queries and process data
 
-    totalResponse = requests.get(overpassUrl, params={"data": totalQuery})
-    totalData = totalResponse.json()
+    totalCount = dataCollector.getTotalCount2(totalQuery)
+    accessibleCount = dataCollector.getAccessibleCount2(accesibleQuery)
 
     # Process API response
-    totalCount = int(totalData["elements"][0]["tags"]["total"])
-    trafficSignalsVibrationCount = int(
-        accesibleData["elements"][0]["tags"]["total"])
 
-    # Obtain percentage
-    trafficSignalsVibrationPercentage = round(
-        (trafficSignalsVibrationCount / totalCount) * 100, 2)
+    trafficSignalsVibrationPercentage = dataCollector.getPercentage(
+        accessibleCount, totalCount)
 
     return trafficSignalsVibrationPercentage

@@ -1,4 +1,4 @@
-import requests
+from app.services.dataCollector import *
 
 
 def getCrossingIslandPercentage(city):
@@ -8,7 +8,7 @@ def getCrossingIslandPercentage(city):
     """
 
     # Define queries to Overpass (Open Street Map)
-    overpassUrl = "https://overpass-api.de/api/interpreter"
+
     accesibleQuery = f"""
     [out:json];
     area[name="{city}"]->.searchArea;
@@ -32,24 +32,15 @@ def getCrossingIslandPercentage(city):
     out count;
     """
 
-    # Send queries for the total and the tagged segment
-    accesibleResponse = requests.get(
-        overpassUrl, params={"data": accesibleQuery})
-    accesibleData = accesibleResponse.json()
+    dataCollector = DataCollector(city)
 
-    totalResponse = requests.get(overpassUrl, params={"data": totalQuery})
-    totalData = totalResponse.json()
-    totalCount = int(totalData["elements"][0]["tags"]["total"])
+    # Send queries and process response data
 
-    # Process API response
-    crossingIslands = 0
-    if "elements" in accesibleData:
-        for element in accesibleData["elements"]:
-            if element["type"] == "node":
-                crossingIslands += 1
+    totalCount = dataCollector.getTotalCount(totalQuery)
+    accessibleCount = dataCollector.getAccessibleCount(accesibleQuery)
 
     # Obtain percentage
-    crossingIslandPercentage = round(
-        (crossingIslands / totalCount) * 100, 2)
+    crossingIslandPercentage = dataCollector.getPercentage(
+        accessibleCount, totalCount)
 
     return crossingIslandPercentage
