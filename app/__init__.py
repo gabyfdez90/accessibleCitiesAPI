@@ -44,32 +44,39 @@ def compareCities(city1, city2):
     crossingIslands1 = getCrossingIslandPercentage(city1Format)
     crossingIslands2 = getCrossingIslandPercentage(city2Format)
 
-    return jsonify(
-        {
+    if cityPercentage1 == 0.0 or cityPercentage2 == 0.0:
+        return jsonify({
             "status": "OK",
+            "message": "One of the cities isn't in Open Street Map."
+        })
+    else:
+        return jsonify(
+            {
+                "status": "OK",
+                "message": "Succesful request",
 
-            "city1": {
-                "name": city1Format,
-                "wheelchairAccessibility": cityPercentage1,
-                "wheelchairFacilitiesInLeisure": leisurePercentage1,
-                "wheelchairTransportation": transportationPercentage1,
-                "wheelchairParking": parkingPercentage1,
-                "tactilePavement": tactilePavementPercentage1,
-                "trafficSignalsSound": trafficSignalsSound1,
-                "trafficSignalsVibration": trafficSignalsVibration1,
-                "crossingIslands": crossingIslands1
-            },
+                "city1": {
+                    "name": city1Format,
+                    "wheelchairAccessibility": cityPercentage1,
+                    "wheelchairFacilitiesInLeisure": leisurePercentage1,
+                    "wheelchairTransportation": transportationPercentage1,
+                    "wheelchairParking": parkingPercentage1,
+                    "tactilePavement": tactilePavementPercentage1,
+                    "trafficSignalsSound": trafficSignalsSound1,
+                    "trafficSignalsVibration": trafficSignalsVibration1,
+                    "crossingIslands": crossingIslands1
+                },
 
-            "city2": {
-                "name": city2Format,
-                "wheelchairAccessibility": cityPercentage2,
-                "wheelchairFacilitiesInLeisure": leisurePercentage2,
-                "wheelchairTransportation": transportationPercentage2,
-                "wheelchairParking": parkingPercentage2,
-                "tactilePavement": tactilePavementPercentage2,
-                "trafficSignalsSound": trafficSignalsSound2,
-                "trafficSignalsVibration": trafficSignalsVibration2,
-                "crossingIslands": crossingIslands2
+                "city2": {
+                    "name": city2Format,
+                    "wheelchairAccessibility": cityPercentage2,
+                    "wheelchairFacilitiesInLeisure": leisurePercentage2,
+                    "wheelchairTransportation": transportationPercentage2,
+                    "wheelchairParking": parkingPercentage2,
+                    "tactilePavement": tactilePavementPercentage2,
+                    "trafficSignalsSound": trafficSignalsSound2,
+                    "trafficSignalsVibration": trafficSignalsVibration2,
+                    "crossingIslands": crossingIslands2
+                }
             }
-        }
-    ), HTTPStatus.OK
+        ), HTTPStatus.OK
