@@ -7,8 +7,9 @@ def getTrafficSignalsSoundPercentage(city):
         that sound when crossing is permitted, because they are very useful in case of visual disabilities.
     """
 
-    # Define queries to Overpass (Open Street Map)
     dataCollector = DataCollector(city)
+
+    # Define queries to Overpass (Open Street Map)
 
     accesibleQuery = f"""
     [out:json];
@@ -32,7 +33,7 @@ def getTrafficSignalsSoundPercentage(city):
     out count;
     """
 
-    # Send queries and process responses
+    # Send queries and process response data
 
     totalCount = dataCollector.getTotalCount2(totalQuery)
     accessibleCount = dataCollector.getAccessibleCount2(accesibleQuery)

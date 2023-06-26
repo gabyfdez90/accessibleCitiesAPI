@@ -1,13 +1,7 @@
 from flask import Flask, jsonify
 from http import HTTPStatus
-from app.modules.wheelchairTotal import *
-from app.modules.leisure import *
-from app.modules.transportation import *
-from app.modules.parking import *
-from app.modules.pavement import *
-from app.modules.trafficSignalsSound import *
-from app.modules.trafficSignalsVibration import *
-from app.modules.crossingIsland import *
+import json
+from app.services.routingCache import checkCacheForData
 
 app = Flask(__name__)
 
@@ -18,37 +12,41 @@ def compareCities(city1, city2):
     city1Format = city1.capitalize()
     city2Format = city2.capitalize()
 
-    cityPercentage1 = getWheelchairPercentage(city1Format)
-    cityPercentage2 = getWheelchairPercentage(city2Format)
+    city1Data = json.loads(checkCacheForData(city1Format))
+    city2Data = json.loads(checkCacheForData(city2Format))
 
-    leisurePercentage1 = getLeisurePercentage(city1Format)
-    leisurePercentage2 = getLeisurePercentage(city2Format)
+    cityPercentage1 = city1Data['wheelchairAccessibility']
+    cityPercentage2 = city2Data['wheelchairAccessibility']
 
-    transportationPercentage1 = getTransportationPercentage(city1Format)
-    transportationPercentage2 = getTransportationPercentage(city2Format)
+    leisurePercentage1 = city1Data["wheelchairFacilitiesInLeisure"]
+    leisurePercentage2 = city2Data["wheelchairFacilitiesInLeisure"]
 
-    parkingPercentage1 = getParkingPercentage(city1Format)
-    parkingPercentage2 = getParkingPercentage(city2Format)
+    transportationPercentage1 = city1Data["wheelchairTransportation"]
+    transportationPercentage2 = city2Data["wheelchairTransportation"]
 
-    tactilePavementPercentage1 = getTactilePavementPercentage(city1Format)
-    tactilePavementPercentage2 = getTactilePavementPercentage(city2Format)
+    parkingPercentage1 = city1Data["wheelchairTransportation"]
+    parkingPercentage2 = city2Data["wheelchairTransportation"]
 
-    trafficSignalsSound1 = getTrafficSignalsSoundPercentage(city1Format)
-    trafficSignalsSound2 = getTrafficSignalsSoundPercentage(city2Format)
+    tactilePavementPercentage1 = city1Data["tactilePavement"]
+    tactilePavementPercentage2 = city2Data["tactilePavement"]
 
-    trafficSignalsVibration1 = getTrafficSignalsVibrationPercentage(
-        city1Format)
-    trafficSignalsVibration2 = getTrafficSignalsVibrationPercentage(
-        city2Format)
+    trafficSignalsSound1 = city1Data["trafficSignalsSound"]
+    trafficSignalsSound2 = city2Data["trafficSignalsSound"]
 
-    crossingIslands1 = getCrossingIslandPercentage(city1Format)
-    crossingIslands2 = getCrossingIslandPercentage(city2Format)
+    trafficSignalsVibration1 = city1Data["trafficSignalsVibration"]
+    trafficSignalsVibration2 = city2Data["trafficSignalsVibration"]
 
-    if cityPercentage1 == 0.0 or cityPercentage2 == 0.0:
+    if cityPercentage1 == 0.0:
         return jsonify({
             "status": "OK",
-            "message": "One of the cities isn't in Open Street Map."
+            "message": f"Sorry, {city1Format} isn't in Open Street Map."
         })
+    if cityPercentage2 == 0.0:
+        return jsonify({
+            "status": "OK",
+            "message": f"Sorry, {city2Format} isn't in Open Street Map."
+        })
+
     else:
         return jsonify(
             {
@@ -63,8 +61,7 @@ def compareCities(city1, city2):
                     "wheelchairParking": parkingPercentage1,
                     "tactilePavement": tactilePavementPercentage1,
                     "trafficSignalsSound": trafficSignalsSound1,
-                    "trafficSignalsVibration": trafficSignalsVibration1,
-                    "crossingIslands": crossingIslands1
+                    "trafficSignalsVibration": trafficSignalsVibration1
                 },
 
                 "city2": {
@@ -75,8 +72,7 @@ def compareCities(city1, city2):
                     "wheelchairParking": parkingPercentage2,
                     "tactilePavement": tactilePavementPercentage2,
                     "trafficSignalsSound": trafficSignalsSound2,
-                    "trafficSignalsVibration": trafficSignalsVibration2,
-                    "crossingIslands": crossingIslands2
+                    "trafficSignalsVibration": trafficSignalsVibration2
                 }
             }
         ), HTTPStatus.OK
