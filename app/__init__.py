@@ -1,9 +1,11 @@
 from flask import Flask, jsonify
 from http import HTTPStatus
 import json
+from flask_cors import CORS
 from app.services.routingCache import checkCacheForData
 
-app = Flask(__name__)
+app = Flask(__name__, instance_relative_config=True)
+CORS(app, resources={r"/*": {"origins": "*"}})
 
 
 @app.route("/api/<string:city1>/<string:city2>")
