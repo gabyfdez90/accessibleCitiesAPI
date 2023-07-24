@@ -2,6 +2,12 @@ from app.services.overpassConnection import *
 
 
 class DataCollector:
+    """
+    This class provides a set of methods to obtain data values
+    from Overpass querys and process them as total count, accessible
+    count and percentage. 
+    """
+
     def __init__(self, city):
         self.city = city
         self.overpass_api = OverpassAPI()
